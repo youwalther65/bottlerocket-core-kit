@@ -142,11 +142,14 @@ fn execute(cmd: &str, args: &[&str], input: Option<&[u8]>) -> Result<Zeroizing<V
     Ok(Zeroizing::new(output.stdout))
 }
 
-/// Probe a block device for filesystem/partition signatures. Returns true if any signature is found.
-/// blkid exit codes: 0 = signatures found, 2 = no signatures found, anything else = error.
-pub fn blkid_has_signature(device: &str) -> Result<bool> {
+/// Check if a block device has a real filesystem. Returns true if a filesystem is found.
+/// Uses high-level probing (no -p flag) which detects filesystem superblocks (XFS, ext4, etc.)
+/// but not partition table signatures (Atari, GPT, etc.), avoiding false positives from
+/// pseudorandom data on encrypted volumes.
+/// blkid exit codes: 0 = filesystem found, 2 = nothing found, anything else = error.
+pub fn blkid_has_filesystem(device: &str) -> Result<bool> {
     let output = Command::new(BLKID)
-        .args(&["-p", device])
+        .args(&[device])
         .stdout(Stdio::null())
         .stderr(Stdio::piped())
         .output()

@@ -134,7 +134,7 @@ fn main() -> Result<()> {
                             .to_str()
                             .expect("path is not valid UTF-8");
                         handle_check(
-                            system::blkid_has_signature(device)?,
+                            system::blkid_has_filesystem(device)?,
                             "block device",
                             &path,
                             false,
