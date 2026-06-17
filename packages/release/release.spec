@@ -143,6 +143,7 @@ Source1609: measure-cmdline.service
 Source1650: prepare-local-fs-encrypted.conf
 Source1651: local-mount-encrypted.conf
 Source1652: repart-local-encrypted.conf
+Source1653: wipefs-local-fs-encrypted.conf
 
 Requires: %{_cross_os}audit
 Requires: %{_cross_os}auditd
@@ -381,6 +382,9 @@ install -p -m 0644 %{S:1651} %{buildroot}%{_cross_unitdir}/local.mount.d/10-encr
 install -d %{buildroot}%{_cross_unitdir}/repart-local.service.d
 install -p -m 0644 %{S:1652} %{buildroot}%{_cross_unitdir}/repart-local.service.d/10-encrypted.conf
 
+install -d %{buildroot}%{_cross_unitdir}/wipefs-local-fs.service.d
+install -p -m 0644 %{S:1653} %{buildroot}%{_cross_unitdir}/wipefs-local-fs.service.d/10-encrypted.conf
+
 ln -s preconfigured.target %{buildroot}%{_cross_unitdir}/default.target
 
 %files
@@ -503,6 +507,7 @@ ln -s preconfigured.target %{buildroot}%{_cross_unitdir}/default.target
 %{_cross_unitdir}/local.mount.d/10-encrypted.conf
 %{_cross_unitdir}/prepare-local-fs.service.d/10-encrypted.conf
 %{_cross_unitdir}/repart-local.service.d/10-encrypted.conf
+%{_cross_unitdir}/wipefs-local-fs.service.d/10-encrypted.conf
 
 %files swap
 %{_cross_sysctldir}/81-release-swap.conf

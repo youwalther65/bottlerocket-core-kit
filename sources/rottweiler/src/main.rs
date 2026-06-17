@@ -425,7 +425,7 @@ struct CheckBlockDeviceUnencryptedCmd {}
 
 #[derive(FromArgs)]
 #[argh(subcommand, name = "unformatted")]
-/// Check if block device has no filesystem or partition signatures
+/// Check if block device has no filesystem
 struct CheckBlockDeviceUnformattedCmd {}
 
 #[derive(FromArgs)]

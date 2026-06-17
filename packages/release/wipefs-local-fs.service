@@ -11,9 +11,9 @@ RefuseManualStop=true
 Type=oneshot
 Environment=DATA_PARTITION_BLOCK_DEVICE=/dev/disk/by-partlabel/BOTTLEROCKET-DATA
 
-# Only wipe when no valid filesystem or partition signature is detected.
-# Prevents mkfs from refusing to format due to pseudorandom data matching
-# signature patterns (e.g. Atari partition table on encrypted EBS volumes).
+# Only wipe when no valid filesystem is detected. Prevents mkfs from refusing
+# to format due to pseudorandom data matching partition table signatures
+# (e.g. Atari partition table on encrypted EBS volumes).
 ExecCondition=/usr/bin/rottweiler check block-device ${DATA_PARTITION_BLOCK_DEVICE} unformatted
 ExecStart=/usr/sbin/wipefs -a ${DATA_PARTITION_BLOCK_DEVICE}
 
