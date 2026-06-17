@@ -77,6 +77,7 @@ Source1047: repart-data-preferred.service
 Source1048: repart-data-fallback.service
 Source1049: prepare-local-fs.service
 Source1050: prepare-swap.service
+Source1051: wipefs-local-fs.service
 
 # Feature-specific units.
 Source1060: capture-kernel-dump.service
@@ -142,6 +143,7 @@ Source1609: measure-cmdline.service
 Source1650: prepare-local-fs-encrypted.conf
 Source1651: local-mount-encrypted.conf
 Source1652: repart-local-encrypted.conf
+Source1653: wipefs-local-fs-encrypted.conf
 
 Requires: %{_cross_os}audit
 Requires: %{_cross_os}auditd
@@ -267,7 +269,7 @@ install -p -m 0644 \
   %{S:1030} \
   %{S:1040} %{S:1041} %{S:1042} %{S:1043} %{S:1044} \
   %{S:1045} %{S:1046} %{S:1047} %{S:1048} %{S:1049} \
-  %{S:1050} \
+  %{S:1050} %{S:1051} \
   %{S:1060} %{S:1061} %{S:1062} %{S:1063} %{S:1064} \
   %{S:1065} %{S:1066} %{S:1067} %{S:1068} \
   %{S:1600} %{S:1601} %{S:1602} %{S:1603} %{S:1604} \
@@ -380,6 +382,9 @@ install -p -m 0644 %{S:1651} %{buildroot}%{_cross_unitdir}/local.mount.d/10-encr
 install -d %{buildroot}%{_cross_unitdir}/repart-local.service.d
 install -p -m 0644 %{S:1652} %{buildroot}%{_cross_unitdir}/repart-local.service.d/10-encrypted.conf
 
+install -d %{buildroot}%{_cross_unitdir}/wipefs-local-fs.service.d
+install -p -m 0644 %{S:1653} %{buildroot}%{_cross_unitdir}/wipefs-local-fs.service.d/10-encrypted.conf
+
 ln -s preconfigured.target %{buildroot}%{_cross_unitdir}/default.target
 
 %files
@@ -437,6 +442,7 @@ ln -s preconfigured.target %{buildroot}%{_cross_unitdir}/default.target
 %{_cross_unitdir}/repart-data-preferred.service
 %{_cross_unitdir}/repart-data-fallback.service
 %{_cross_unitdir}/prepare-local-fs.service
+%{_cross_unitdir}/wipefs-local-fs.service
 %{_cross_unitdir}/deprecation-warning@.service
 %{_cross_unitdir}/deprecation-warning@.timer
 %{_cross_unitdir}/service.d/00-aws-config.conf
@@ -501,6 +507,7 @@ ln -s preconfigured.target %{buildroot}%{_cross_unitdir}/default.target
 %{_cross_unitdir}/local.mount.d/10-encrypted.conf
 %{_cross_unitdir}/prepare-local-fs.service.d/10-encrypted.conf
 %{_cross_unitdir}/repart-local.service.d/10-encrypted.conf
+%{_cross_unitdir}/wipefs-local-fs.service.d/10-encrypted.conf
 
 %files swap
 %{_cross_sysctldir}/81-release-swap.conf

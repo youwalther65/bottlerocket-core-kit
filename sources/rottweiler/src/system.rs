@@ -8,6 +8,7 @@ type Result<T> = std::result::Result<T, snafu::Whatever>;
 const SYSTEMD_CREDS: &str = "/usr/bin/systemd-creds";
 const SYSTEMD_CRYPTSETUP: &str = "/usr/lib/systemd/systemd-cryptsetup";
 const CRYPTSETUP: &str = "/usr/sbin/cryptsetup";
+const BLKID: &str = "/usr/sbin/blkid";
 const APICLIENT: &str = "/usr/bin/apiclient";
 const TPM2_PCREXTEND: &str = "/usr/bin/tpm2_pcrextend";
 
@@ -139,6 +140,30 @@ fn execute(cmd: &str, args: &[&str], input: Option<&[u8]>) -> Result<Zeroizing<V
     }
 
     Ok(Zeroizing::new(output.stdout))
+}
+
+/// Check if a block device has a real filesystem. Returns true if a filesystem is found.
+/// Uses high-level probing (no -p flag) which detects filesystem superblocks (XFS, ext4, etc.)
+/// but not partition table signatures (Atari, GPT, etc.), avoiding false positives from
+/// pseudorandom data on encrypted volumes.
+/// blkid exit codes: 0 = filesystem found, 2 = nothing found, anything else = error.
+pub fn blkid_has_filesystem(device: &str) -> Result<bool> {
+    let output = Command::new(BLKID)
+        .args(&[device])
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .output()
+        .with_whatever_context(|_| format!("failed to run {} on {}", BLKID, device))?;
+
+    match output.status.code() {
+        Some(0) => Ok(true),
+        Some(2) => Ok(false),
+        Some(code) => {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            whatever!("{} failed with exit code {}: {}", BLKID, code, stderr.trim());
+        }
+        None => whatever!("{} was terminated by a signal", BLKID),
+    }
 }
 
 /// Get TPM2 PCRs to bind to based on image features

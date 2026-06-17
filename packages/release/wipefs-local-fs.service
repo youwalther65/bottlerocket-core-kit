@@ -1,0 +1,24 @@
+[Unit]
+Description=Wipe False-Positive Signatures on Data Partition
+DefaultDependencies=no
+Wants=dev-disk-by\x2dpartlabel-BOTTLEROCKET\x2dDATA.device
+After=dev-disk-by\x2dpartlabel-BOTTLEROCKET\x2dDATA.device
+Before=prepare-local-fs.service
+RefuseManualStart=true
+RefuseManualStop=true
+
+[Service]
+Type=oneshot
+Environment=DATA_PARTITION_BLOCK_DEVICE=/dev/disk/by-partlabel/BOTTLEROCKET-DATA
+
+# Only wipe when no valid filesystem is detected. Prevents mkfs from refusing
+# to format due to pseudorandom data matching partition table signatures
+# (e.g. Atari partition table on encrypted EBS volumes).
+ExecCondition=/usr/bin/rottweiler check block-device ${DATA_PARTITION_BLOCK_DEVICE} unformatted
+ExecStart=/usr/sbin/wipefs -a ${DATA_PARTITION_BLOCK_DEVICE}
+
+RemainAfterExit=true
+StandardError=journal+console
+
+[Install]
+RequiredBy=prepare-local-fs.service

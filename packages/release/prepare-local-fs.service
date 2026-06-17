@@ -3,7 +3,7 @@ Description=Prepare Local Filesystem (/local)
 DefaultDependencies=no
 Before=local-fs.target
 Wants=dev-disk-by\x2dpartlabel-BOTTLEROCKET\x2dDATA.device
-After=dev-disk-by\x2dpartlabel-BOTTLEROCKET\x2dDATA.device
+After=dev-disk-by\x2dpartlabel-BOTTLEROCKET\x2dDATA.device wipefs-local-fs.service
 RefuseManualStart=true
 RefuseManualStop=true
 
