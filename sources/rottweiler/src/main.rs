@@ -18,7 +18,7 @@ interface for encrypting and managing encrypted storage resources including:
 - `attach block-device <path> <key-id>` - Attach an encrypted block device
 - `detach block-device <path>` - Detach an encrypted block device
 - `resize block-device <path> <key-id>` - Resize a LUKS block device
-- `check block-device <path> encrypted|unencrypted` - Check block device encryption state
+- `check block-device <path> encrypted|unencrypted|unformatted` - Check block device state
 
 ### Directory Operations
 - `encrypt directory <path> <key-id>` - Encrypt a directory using fscrypt
@@ -129,6 +129,18 @@ fn main() -> Result<()> {
                         false,
                         "encrypted",
                     ),
+                    CheckBlockDeviceState::Unformatted(_) => {
+                        let device = path
+                            .to_str()
+                            .expect("path is not valid UTF-8");
+                        handle_check(
+                            system::blkid_has_signature(device)?,
+                            "block device",
+                            &path,
+                            false,
+                            "formatted",
+                        )
+                    }
                 }
             }
             CheckResource::Directory(cmd) => {
@@ -398,6 +410,7 @@ struct CheckBlockDeviceCmd {
 enum CheckBlockDeviceState {
     Encrypted(CheckBlockDeviceEncryptedCmd),
     Unencrypted(CheckBlockDeviceUnencryptedCmd),
+    Unformatted(CheckBlockDeviceUnformattedCmd),
 }
 
 #[derive(FromArgs)]
@@ -409,6 +422,11 @@ struct CheckBlockDeviceEncryptedCmd {}
 #[argh(subcommand, name = "unencrypted")]
 /// Check if unencrypted
 struct CheckBlockDeviceUnencryptedCmd {}
+
+#[derive(FromArgs)]
+#[argh(subcommand, name = "unformatted")]
+/// Check if block device has no filesystem or partition signatures
+struct CheckBlockDeviceUnformattedCmd {}
 
 #[derive(FromArgs)]
 #[argh(subcommand, name = "directory")]
